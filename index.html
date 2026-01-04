@@ -50,6 +50,15 @@
       display: block;
     }
 
+    a:focus-visible,
+    button:focus-visible,
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 4px rgba(33, 148, 184, 0.25);
+      border-radius: var(--radius-pill);
+    }
+
     .page {
       max-width: 1200px;
       margin: 0 auto;
@@ -873,7 +882,13 @@
         <a href="#login" class="btn btn-outline">Log in</a>
         <a href="#signup" class="btn btn-primary">Get started</a>
       </div>
-      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+      <button
+        class="nav-toggle"
+        id="nav-toggle"
+        aria-label="Toggle navigation"
+        aria-expanded="false"
+        aria-controls="nav-links"
+      >
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -1403,8 +1418,34 @@
     const navToggle = document.getElementById("nav-toggle");
     const navLinks = document.getElementById("nav-links");
 
+    const closeNav = () => {
+      navLinks.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+    };
+
     navToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("open");
+      const isOpen = navLinks.classList.toggle("open");
+      navToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    navLinks.addEventListener("click", (event) => {
+      if (event.target instanceof HTMLElement && event.target.closest("a")) {
+        closeNav();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const isOpen = navLinks.classList.contains("open");
+      if (!isOpen) return;
+      if (navLinks.contains(event.target) || navToggle.contains(event.target)) return;
+      closeNav();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && navLinks.classList.contains("open")) {
+        closeNav();
+        navToggle.focus();
+      }
     });
 
     const yearSpan = document.getElementById("year");
